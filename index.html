@@ -526,7 +526,8 @@ function calculateChallan() {
     }
     const scrutiny = plot * 4;
     const landDev = plot * asr * 0.015;
-    const betterment = plot * 1837 * (plot < 200 ? 0.75 : 0.5);
+    //const betterment = plot * 1837 * (plot < 200 ? 0.75 : 0.5);
+    const betterment = plot * 1837 * (0.5);
     const total = scrutiny + landDev + betterment;
 
     html = `
@@ -540,7 +541,7 @@ function calculateChallan() {
         <tr><th>${textContent[currentLanguage].tableSrNo}</th><th>${textContent[currentLanguage].tableCharges}</th><th>${textContent[currentLanguage].tableRate}</th><th>${textContent[currentLanguage].tablePercentage}</th><th>${textContent[currentLanguage].tableAmount}</th></tr>
         <tr><td>1</td><td>${textContent[currentLanguage].scrutinyFee}</td><td>4</td><td>NA</td><td>INR ${formatNumber(scrutiny)}</td></tr>
         <tr><td>2</td><td>${textContent[currentLanguage].landDevCharges}</td><td>${asr}</td><td>1.5%</td><td>INR ${formatNumber(landDev)}</td></tr>
-        <tr><td>3</td><td>${textContent[currentLanguage].bettermentCharges}</td><td>1837</td><td>${plot < 200 ? '75%' : '50%'}</td><td>INR ${formatNumber(betterment)}</td></tr>
+        <tr><td>3</td><td>${textContent[currentLanguage].bettermentCharges}</td><td>1837</td><td>50%</td><td>INR ${formatNumber(betterment)}</td></tr>
         <tr><td colspan="4"><strong>${textContent[currentLanguage].total}</strong></td><td><strong>INR ${Math.ceil(total).toLocaleString('en-IN')}</strong></td></tr>
       </table>`;
   } else { // type.value === 'built'
