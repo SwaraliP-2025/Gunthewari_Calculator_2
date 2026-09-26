@@ -608,8 +608,8 @@ comm = parseFloat(document.getElementById('comm_builtup').value);
 margin = parseFloat(document.getElementById('margin_area').value);
 
 if ([plot, asr, res, comm, margin].some(val => isNaN(val))) {
-  alert(textContent[currentLanguage].alertFillBuilt);
-  return;
+    alert(textContent[currentLanguage].alertFillBuilt);
+    return;
 }
 
 // Maximum permissible built-up area
@@ -626,23 +626,9 @@ ancillary = Math.max(0, toRes - (plot * 1.1));
 const scrutiny = Math.max(plot, res + comm) * 4;
 
 
-/*
- * ============================================================
- * BETTERMENT CHARGES - AS PER GR
- * Current date: 26/09/2026
- * Applicable GR period: 16/07/2026 to 31/10/2026
- *
- * 0 to 300 sq.m:
- *     100% concession on Betterment Charges
- *
- * Above 300 to 2000 sq.m:
- *     100% concession on Plinth Built-up Area.
- *     Remaining Open Land Area is chargeable.
- *
- * Above 2000 sq.m:
- *     Entire Plot Area is chargeable.
- * ============================================================
- */
+// ============================================================
+// BETTERMENT CHARGES - AREA-WISE
+// ============================================================
 
 const plinthArea = Math.min(res + comm, plot);
 
@@ -651,202 +637,200 @@ let bettermentDisplay = '';
 
 if (plot <= 300) {
 
-  // 100% concession
-  betterment = 0;
-  bettermentDisplay = '100% Concession';
+    // 0 to 300 sq.m - 100% concession
+    betterment = 0;
+    bettermentDisplay = '0%';
 
 } else if (plot <= 2000) {
 
-  // Plinth Built-up Area gets 100% concession.
-  // Remaining open land is chargeable.
-  const openLandArea = Math.max(0, plot - plinthArea);
+    // Above 300 to 2000 sq.m
+    // Plinth area has 100% concession.
+    // Remaining open land is charged at 100%.
+    const openLandArea = Math.max(0, plot - plinthArea);
 
-  betterment = openLandArea * 1837 * 1.00;
-  bettermentDisplay = '100% on Open Land';
+    betterment = openLandArea * 1837;
+    bettermentDisplay = '100%';
 
 } else {
 
-  // Above 2000 sq.m:
-  // Entire plot area is chargeable.
-  betterment = plot * 1837 * 1.00;
-  bettermentDisplay = '100% Payable';
+    // Above 2000 sq.m
+    // Entire plot area is charged at 100%.
+    betterment = plot * 1837;
+    bettermentDisplay = '100%';
 }
 
 
-/*
- * Existing ASR-based charges
- * These rates are retained from your existing calculator.
- */
+// ============================================================
+// EXISTING ASR-BASED CHARGES
+// ============================================================
 
 const landDev = plot * asr * 0.015;
-
 const cityRes = toRes * asr * 0.02;
-
 const cityComm = toComm * asr * 0.04;
-
 const ancillaryAmt = ancillary * asr * 0.10;
-
 const marginal = margin * asr * 0.10;
 
 
-// Total Charges
+// ============================================================
+// TOTAL CHARGES
+// ============================================================
+
 const total =
-  scrutiny +
-  betterment +
-  landDev +
-  cityRes +
-  cityComm +
-  ancillaryAmt * 2 +
-  marginal;
+    scrutiny +
+    betterment +
+    landDev +
+    cityRes +
+    cityComm +
+    (ancillaryAmt * 2) +
+    marginal;
 
 
-/*
- * ============================================================
- * OUTPUT
- * ============================================================
- */
+// ============================================================
+// OUTPUT
+// ============================================================
 
 html = `
-  <div style='margin-bottom: 20px;'>
+    <div style='margin-bottom: 20px;'>
 
-    <h3>${textContent[currentLanguage].outputUserSummary}</h3>
+        <h3>${textContent[currentLanguage].outputUserSummary}</h3>
 
-    <p>
-      <strong>${textContent[currentLanguage].outputPlotArea}:</strong>
-      ${plot} ${textContent[currentLanguage].sqmUnit}
-    </p>
+        <p>
+            <strong>${textContent[currentLanguage].outputPlotArea}:</strong>
+            ${plot} ${textContent[currentLanguage].sqmUnit}
+        </p>
 
-    <p>
-      <strong>${textContent[currentLanguage].outputASRRate}:</strong>
-      ${asr}
-    </p>
+        <p>
+            <strong>${textContent[currentLanguage].outputASRRate}:</strong>
+            ${asr}
+        </p>
 
-    <p>
-      <strong>${textContent[currentLanguage].outputResBuiltup}:</strong>
-      ${res} ${textContent[currentLanguage].sqmUnit}
-    </p>
+        <p>
+            <strong>${textContent[currentLanguage].outputResBuiltup}:</strong>
+            ${res} ${textContent[currentLanguage].sqmUnit}
+        </p>
 
-    <p>
-      <strong>${textContent[currentLanguage].outputCommBuiltup}:</strong>
-      ${comm} ${textContent[currentLanguage].sqmUnit}
-    </p>
+        <p>
+            <strong>${textContent[currentLanguage].outputCommBuiltup}:</strong>
+            ${comm} ${textContent[currentLanguage].sqmUnit}
+        </p>
 
-    <p>
-      <strong>${textContent[currentLanguage].outputMarginArea}:</strong>
-      ${margin} ${textContent[currentLanguage].sqmUnit}
-    </p>
+        <p>
+            <strong>${textContent[currentLanguage].outputMarginArea}:</strong>
+            ${margin} ${textContent[currentLanguage].sqmUnit}
+        </p>
 
-    <p>
-      <strong>${textContent[currentLanguage].outputMaxBuiltAllowed}:</strong>
-      ${maxBuilt.toFixed(2)} ${textContent[currentLanguage].sqmUnit}
-    </p>
+        <p>
+            <strong>${textContent[currentLanguage].outputMaxBuiltAllowed}:</strong>
+            ${maxBuilt.toFixed(2)} ${textContent[currentLanguage].sqmUnit}
+        </p>
 
-    <p>
-      <strong>${textContent[currentLanguage].outputAncillaryConsumed}:</strong>
-      ${ancillary.toFixed(2)} ${textContent[currentLanguage].sqmUnit}
-    </p>
+        <p>
+            <strong>${textContent[currentLanguage].outputAncillaryConsumed}:</strong>
+            ${ancillary.toFixed(2)} ${textContent[currentLanguage].sqmUnit}
+        </p>
 
-    <p>
-      <strong>${textContent[currentLanguage].outputToRegularizedRes}:</strong>
-      ${toRes.toFixed(2)} ${textContent[currentLanguage].sqmUnit}
-    </p>
+        <p>
+            <strong>${textContent[currentLanguage].outputToRegularizedRes}:</strong>
+            ${toRes.toFixed(2)} ${textContent[currentLanguage].sqmUnit}
+        </p>
 
-    <p>
-      <strong>${textContent[currentLanguage].outputToRegularizedComm}:</strong>
-      ${toComm.toFixed(2)} ${textContent[currentLanguage].sqmUnit}
-    </p>
+        <p>
+            <strong>${textContent[currentLanguage].outputToRegularizedComm}:</strong>
+            ${toComm.toFixed(2)} ${textContent[currentLanguage].sqmUnit}
+        </p>
 
-    <p>
-      <strong>${textContent[currentLanguage].outputNotRegularizedArea}:</strong>
-      ${Math.max(0, comm - maxBuilt).toFixed(2)}
-      ${textContent[currentLanguage].sqmUnit}
-    </p>
+        <p>
+            <strong>${textContent[currentLanguage].outputNotRegularizedArea}:</strong>
+            ${Math.max(0, comm - maxBuilt).toFixed(2)}
+            ${textContent[currentLanguage].sqmUnit}
+        </p>
 
-  </div>
+    </div>
 
-  <h3>${textContent[currentLanguage].outputBuiltChargesTitle}</h3>
+    <h3>${textContent[currentLanguage].outputBuiltChargesTitle}</h3>
 
-  <table>
+    <table>
 
-    <tr>
-      <th>${textContent[currentLanguage].tableCharges}</th>
-      <th>${textContent[currentLanguage].tableRate}</th>
-      <th>${textContent[currentLanguage].tablePercentage}</th>
-      <th>${textContent[currentLanguage].tableAmount}</th>
-    </tr>
+        <tr>
+            <th>${textContent[currentLanguage].tableCharges}</th>
+            <th>${textContent[currentLanguage].tableRate}</th>
+            <th>${textContent[currentLanguage].tablePercentage}</th>
+            <th>${textContent[currentLanguage].tableAmount}</th>
+        </tr>
 
-    <tr>
-      <td>${textContent[currentLanguage].scrutinyFee}</td>
-      <td>4</td>
-      <td>NA</td>
-      <td>INR ${formatNumber(scrutiny)}</td>
-    </tr>
+        <tr>
+            <td>${textContent[currentLanguage].scrutinyFee}</td>
+            <td>4</td>
+            <td>NA</td>
+            <td>INR ${formatNumber(scrutiny)}</td>
+        </tr>
 
-    <tr>
-      <td>${textContent[currentLanguage].bettermentCharges}</td>
-      <td>1837</td>
-      <td>${bettermentDisplay}</td>
-      <td>INR ${formatNumber(betterment)}</td>
-    </tr>
+        <tr>
+            <td>${textContent[currentLanguage].bettermentCharges}</td>
+            <td>1837</td>
+            <td>${bettermentDisplay}</td>
+            <td>INR ${formatNumber(betterment)}</td>
+        </tr>
 
-    <tr>
-      <td>${textContent[currentLanguage].landDevCharges}</td>
-      <td>${asr}</td>
-      <td>1.5%</td>
-      <td>INR ${formatNumber(landDev)}</td>
-    </tr>
+        <tr>
+            <td>${textContent[currentLanguage].landDevCharges}</td>
+            <td>${asr}</td>
+            <td>1.5%</td>
+            <td>INR ${formatNumber(landDev)}</td>
+        </tr>
 
-    <tr>
-      <td>${textContent[currentLanguage].cityDevChargesRes}</td>
-      <td>${asr}</td>
-      <td>2%</td>
-      <td>INR ${formatNumber(cityRes)}</td>
-    </tr>
+        <tr>
+            <td>${textContent[currentLanguage].cityDevChargesRes}</td>
+            <td>${asr}</td>
+            <td>2%</td>
+            <td>INR ${formatNumber(cityRes)}</td>
+        </tr>
 
-    <tr>
-      <td>${textContent[currentLanguage].cityDevChargesComm}</td>
-      <td>${asr}</td>
-      <td>4%</td>
-      <td>INR ${formatNumber(cityComm)}</td>
-    </tr>
+        <tr>
+            <td>${textContent[currentLanguage].cityDevChargesComm}</td>
+            <td>${asr}</td>
+            <td>4%</td>
+            <td>INR ${formatNumber(cityComm)}</td>
+        </tr>
 
-    <tr>
-      <td>${textContent[currentLanguage].ancillary}</td>
-      <td>${asr}</td>
-      <td>10%</td>
-      <td>INR ${formatNumber(ancillaryAmt)}</td>
-    </tr>
+        <tr>
+            <td>${textContent[currentLanguage].ancillary}</td>
+            <td>${asr}</td>
+            <td>10%</td>
+            <td>INR ${formatNumber(ancillaryAmt)}</td>
+        </tr>
 
-    <tr>
-      <td>${textContent[currentLanguage].areaAsPerTip}</td>
-      <td colspan="2">
-        ${textContent[currentLanguage].asPerAncillary}
-      </td>
-      <td>INR ${formatNumber(ancillaryAmt)}</td>
-    </tr>
+        <tr>
+            <td>${textContent[currentLanguage].areaAsPerTip}</td>
+            <td colspan="2">
+                ${textContent[currentLanguage].asPerAncillary}
+            </td>
+            <td>INR ${formatNumber(ancillaryAmt)}</td>
+        </tr>
 
-    <tr>
-      <td>${textContent[currentLanguage].marginalDistancePenalty}</td>
-      <td>${asr}</td>
-      <td>10%</td>
-      <td>INR ${formatNumber(marginal)}</td>
-    </tr>
+        <tr>
+            <td>${textContent[currentLanguage].marginalDistancePenalty}</td>
+            <td>${asr}</td>
+            <td>10%</td>
+            <td>INR ${formatNumber(marginal)}</td>
+        </tr>
 
-    <tr>
-      <td colspan="3">
-        <strong>${textContent[currentLanguage].total}</strong>
-      </td>
+        <tr>
+            <td colspan="3">
+                <strong>${textContent[currentLanguage].total}</strong>
+            </td>
 
-      <td>
-        <strong>
-          INR ${Math.ceil(total).toLocaleString('en-IN')}
-        </strong>
-      </td>
-    </tr>
+            <td>
+                <strong>
+                    INR ${Math.ceil(total).toLocaleString('en-IN')}
+                </strong>
+            </td>
+        </tr>
 
-  </table>`;
+    </table>`;
 }
 
+// as it is
   document.getElementById('output').innerHTML = html;
 }
 
