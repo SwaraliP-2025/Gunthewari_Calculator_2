@@ -528,7 +528,7 @@ function calculateChallan() {
     const landDev = plot * asr * 0.015;
     //const betterment = plot * 1837 * (plot < 200 ? 0.75 : 0.5);
     //const betterment = plot * 1837 * (0.5);
-    const betterment = plot * 1837 * (0.25);
+    const betterment = plot * 1837 * (0.75);
     const total = scrutiny + landDev + betterment;
 
     html = `
@@ -542,7 +542,7 @@ function calculateChallan() {
         <tr><th>${textContent[currentLanguage].tableSrNo}</th><th>${textContent[currentLanguage].tableCharges}</th><th>${textContent[currentLanguage].tableRate}</th><th>${textContent[currentLanguage].tablePercentage}</th><th>${textContent[currentLanguage].tableAmount}</th></tr>
         <tr><td>1</td><td>${textContent[currentLanguage].scrutinyFee}</td><td>4</td><td>NA</td><td>INR ${formatNumber(scrutiny)}</td></tr>
         <tr><td>2</td><td>${textContent[currentLanguage].landDevCharges}</td><td>${asr}</td><td>1.5%</td><td>INR ${formatNumber(landDev)}</td></tr>
-        <tr><td>3</td><td>${textContent[currentLanguage].bettermentCharges}</td><td>1837</td><td>25%</td><td>INR ${formatNumber(betterment)}</td></tr>
+        <tr><td>3</td><td>${textContent[currentLanguage].bettermentCharges}</td><td>1837</td><td>75%</td><td>INR ${formatNumber(betterment)}</td></tr>
         <tr><td colspan="4"><strong>${textContent[currentLanguage].total}</strong></td><td><strong>INR ${Math.ceil(total).toLocaleString('en-IN')}</strong></td></tr>
       </table>`;
   } else { // type.value === 'built'
@@ -563,7 +563,7 @@ function calculateChallan() {
     const scrutiny = Math.max(plot, res + comm) * 4;
     // const betterment = plot * 1670 * (plot < 200 ? 0 : 1);
    // const betterment = plot * 1837 * 0; // 1837 × 0%
-    const betterment = plot * 1837 * 1;
+    const betterment = plot * 1837 * 0;
     const landDev = plot * asr * 0.015;
     const cityRes = toRes * asr * 0.02;
     const cityComm = toComm * asr * 0.04;
@@ -589,7 +589,7 @@ function calculateChallan() {
       <table>
         <tr><th>${textContent[currentLanguage].tableCharges}</th><th>${textContent[currentLanguage].tableRate}</th><th>${textContent[currentLanguage].tablePercentage}</th><th>${textContent[currentLanguage].tableAmount}</th></tr>
         <tr><td>${textContent[currentLanguage].scrutinyFee}</td><td>4</td><td>NA</td><td>INR ${formatNumber(scrutiny)}</td></tr>
-        <tr><td>${textContent[currentLanguage].bettermentCharges}</td><td>1837</td><td>100%</td><td>INR ${formatNumber(betterment)}</td></tr>
+        <tr><td>${textContent[currentLanguage].bettermentCharges}</td><td>1837</td><td>0%</td><td>INR ${formatNumber(betterment)}</td></tr>
         <tr><td>${textContent[currentLanguage].landDevCharges}</td><td>${asr}</td><td>1.5%</td><td>INR ${formatNumber(landDev)}</td></tr>
         <tr><td>${textContent[currentLanguage].cityDevChargesRes}</td><td>${asr}</td><td>2%</td><td>INR ${formatNumber(cityRes)}</td></tr>
         <tr><td>${textContent[currentLanguage].cityDevChargesComm}</td><td>${asr}</td><td>4%</td><td>INR ${formatNumber(cityComm)}</td></tr>
