@@ -253,6 +253,15 @@
     footer.links-section a:hover {
       color: var(--gov-saffron);
     }
+    .betterment-tip {
+      display: block;
+      margin-top: 6px;
+      font-size: 0.88rem;
+      font-weight: normal;
+      font-style: italic;
+      color: #555;
+      line-height: 1.35;
+    }
     @media (max-width: 600px) {
       form { padding: 10px; }
       .header-title h1 { font-size: 1.2rem; }
@@ -397,6 +406,10 @@ const textContent = {
     areaAsPerTip: 'Area as per Tip',
     marginalDistancePenalty: 'Marginal Distance Penalty',
     asPerAncillary: 'As per Ancillary',
+    openPlotBettermentTip:
+      'In the regularization of the said plot, the provisions of Regulation No. 3.4.1 of the UDCPR shall be applicable in respect of a minimum 10% open space.',
+    builtPlotBettermentTip:
+      'The provisions regarding open space under Regulation No. 3.4.1 shall be applicable.',
   },
   mr: {
     mainTitle: 'छत्रपती संभाजीनगर महानगरपालिका',
@@ -453,8 +466,16 @@ const textContent = {
     areaAsPerTip: 'टिप क्षेत्र',
     marginalDistancePenalty: 'मार्जिन पेनल्टी',
     asPerAncillary: 'पूरक',
+    openPlotBettermentTip:
+      'सदर भूखंडाच्या नियमितीकरणामध्ये किमान 10% खुली जागेकरिता UDCPR मधील विनियम क्रमांक 3.4.1 मधील तरतूदी लागु राहतील',
+    builtPlotBettermentTip: '3.4.1 मधील खुल्या जागेच्या तरतूदी लागू राहतील',
   }
 };
+
+function bettermentChargesCell(label, tipText) {
+  if (!tipText) return label;
+  return `${label}<span class="betterment-tip">${tipText}</span>`;
+}
 
 function updateContent() {
   const lang = currentLanguage;
@@ -526,9 +547,12 @@ function calculateChallan() {
     }
     const scrutiny = plot * 4;
     const landDev = plot * asr * 0.015;
-    //const betterment = plot * 1837 * (plot < 200 ? 0.75 : 0.5);
-    //const betterment = plot * 1837 * (0.5);
-    const betterment = plot * 1837 * (0.75);
+    const bettermentPct = 0.5;
+    const betterment = plot * 1837 * bettermentPct;
+    const openBettermentTip =
+      plot >= 450 && plot <= 3999
+        ? textContent[currentLanguage].openPlotBettermentTip
+        : '';
     const total = scrutiny + landDev + betterment;
 
     html = `
@@ -542,7 +566,7 @@ function calculateChallan() {
         <tr><th>${textContent[currentLanguage].tableSrNo}</th><th>${textContent[currentLanguage].tableCharges}</th><th>${textContent[currentLanguage].tableRate}</th><th>${textContent[currentLanguage].tablePercentage}</th><th>${textContent[currentLanguage].tableAmount}</th></tr>
         <tr><td>1</td><td>${textContent[currentLanguage].scrutinyFee}</td><td>4</td><td>NA</td><td>INR ${formatNumber(scrutiny)}</td></tr>
         <tr><td>2</td><td>${textContent[currentLanguage].landDevCharges}</td><td>${asr}</td><td>1.5%</td><td>INR ${formatNumber(landDev)}</td></tr>
-        <tr><td>3</td><td>${textContent[currentLanguage].bettermentCharges}</td><td>1837</td><td>75%</td><td>INR ${formatNumber(betterment)}</td></tr>
+        <tr><td>3</td><td>${bettermentChargesCell(textContent[currentLanguage].bettermentCharges, openBettermentTip)}</td><td>1837</td><td>50%</td><td>INR ${formatNumber(betterment)}</td></tr>
         <tr><td colspan="4"><strong>${textContent[currentLanguage].total}</strong></td><td><strong>INR ${Math.ceil(total).toLocaleString('en-IN')}</strong></td></tr>
       </table>`;
   // } else { // type.value === 'built'
@@ -634,30 +658,28 @@ const plinthArea = Math.min(res + comm, plot);
 
 let betterment = 0;
 let bettermentDisplay = '';
+let builtBettermentTip = '';
 
 if (plot <= 300) {
-
-    // 0 to 300 sq.m - 100% concession
-    betterment = 0;
+    betterment = plot * 1837 * 0;   // 0% payable
     bettermentDisplay = '0%';
 
 } else if (plot <= 2000) {
-
-    // Above 300 to 2000 sq.m
-    // Plinth area has 100% concession.
-    // Remaining open land is charged at 100%.
     const openLandArea = Math.max(0, plot - plinthArea);
 
-    betterment = openLandArea * 1837;
+    betterment = openLandArea * 1837 * 1;   // 100% payable
     bettermentDisplay = '100%';
+    builtBettermentTip = textContent[currentLanguage].builtPlotBettermentTip;
 
 } else {
-
-    // Above 2000 sq.m
-    // Entire plot area is charged at 100%.
-    betterment = plot * 1837;
+    betterment = plot * 1837 * 1;   // 100% payable
     bettermentDisplay = '100%';
 }
+
+const tipAreaAmt = 0;
+const tipAreaDisplay = '0%';
+const marginal = 0;
+const marginalDisplay = '0%';
 
 
 // ============================================================
@@ -668,7 +690,6 @@ const landDev = plot * asr * 0.015;
 const cityRes = toRes * asr * 0.02;
 const cityComm = toComm * asr * 0.04;
 const ancillaryAmt = ancillary * asr * 0.10;
-const marginal = margin * asr * 0.10;
 
 
 // ============================================================
@@ -681,7 +702,8 @@ const total =
     landDev +
     cityRes +
     cityComm +
-    (ancillaryAmt * 2) +
+    ancillaryAmt +
+    tipAreaAmt +
     marginal;
 
 
@@ -766,7 +788,7 @@ html = `
         </tr>
 
         <tr>
-            <td>${textContent[currentLanguage].bettermentCharges}</td>
+            <td>${bettermentChargesCell(textContent[currentLanguage].bettermentCharges, builtBettermentTip)}</td>
             <td>1837</td>
             <td>${bettermentDisplay}</td>
             <td>INR ${formatNumber(betterment)}</td>
@@ -802,16 +824,15 @@ html = `
 
         <tr>
             <td>${textContent[currentLanguage].areaAsPerTip}</td>
-            <td colspan="2">
-                ${textContent[currentLanguage].asPerAncillary}
-            </td>
-            <td>INR ${formatNumber(ancillaryAmt)}</td>
+            <td>${asr}</td>
+            <td>${tipAreaDisplay}</td>
+            <td>INR ${formatNumber(tipAreaAmt)}</td>
         </tr>
 
         <tr>
             <td>${textContent[currentLanguage].marginalDistancePenalty}</td>
             <td>${asr}</td>
-            <td>10%</td>
+            <td>${marginalDisplay}</td>
             <td>INR ${formatNumber(marginal)}</td>
         </tr>
 
