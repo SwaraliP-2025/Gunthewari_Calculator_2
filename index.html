@@ -677,7 +677,6 @@ if (plot <= 300) {
 }
 
 const tipAreaAmt = 0;
-const tipAreaDisplay = '0%';
 const marginal = 0;
 const marginalDisplay = '0%';
 
@@ -824,8 +823,7 @@ html = `
 
         <tr>
             <td>${textContent[currentLanguage].areaAsPerTip}</td>
-            <td>${asr}</td>
-            <td>${tipAreaDisplay}</td>
+            <td colspan="2">${textContent[currentLanguage].asPerAncillary}</td>
             <td>INR ${formatNumber(tipAreaAmt)}</td>
         </tr>
 
