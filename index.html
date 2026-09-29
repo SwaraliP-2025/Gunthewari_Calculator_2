@@ -338,17 +338,40 @@
   </ul>
 </footer>
 <script>
-fetch('https://api.countapi.xyz/hit/gunthewari/calculator')
-  .then(res => res.json())
-  .then(res => {
-    document.getElementById('visitor-counter').innerText = res.value;
-  });
-
-// ... your entire JS code from before here ...
-// (Paste your calculation, language switching, and other logic here.)
-
 let usageCounter = 0;
 let currentLanguage = 'en';
+
+const VISITOR_COUNTER_KEY = 'csmc_gunthewari_website_visitors';
+const VISITOR_SESSION_FLAG = 'csmc_gunthewari_visitor_counted';
+const VISITOR_API_BASE = 'https://countapi.mileshilliard.com/api/v1';
+
+function formatVisitorCount(value) {
+  const count = Number(value);
+  return Number.isFinite(count) ? count.toLocaleString('en-IN') : '--';
+}
+
+function updateVisitorCounter() {
+  const counterEl = document.getElementById('visitor-counter');
+  if (!counterEl) return;
+
+  const alreadyCounted = sessionStorage.getItem(VISITOR_SESSION_FLAG) === '1';
+  const endpoint = alreadyCounted ? 'get' : 'hit';
+
+  fetch(`${VISITOR_API_BASE}/${endpoint}/${VISITOR_COUNTER_KEY}`)
+    .then((res) => {
+      if (!res.ok) throw new Error('Visitor counter request failed');
+      return res.json();
+    })
+    .then((data) => {
+      counterEl.innerText = formatVisitorCount(data.value);
+      if (!alreadyCounted) {
+        sessionStorage.setItem(VISITOR_SESSION_FLAG, '1');
+      }
+    })
+    .catch(() => {
+      counterEl.innerText = '--';
+    });
+}
 
 const textContent = {
   en: {
@@ -369,6 +392,7 @@ const textContent = {
     marginAreaPlaceholder: 'Built-up in Margins (sq.m)',
     calculateBtn: 'Calculate',
     generatePdfBtn: 'Generate PDF',
+    visitorCounterLabel: 'Total Website Visitors:',
     counterLabel: 'Utilization Counter',
     disclaimerTitle: 'Disclaimer',
     disclaimerText: 'Please note that the calculator indicates only the approximate Challan amount.<br>The Final payable Challan amount needs to be verified and approved by the respective Zone Engineer.<br>This challan receipt is system generated and does not require a signature.',
@@ -409,7 +433,7 @@ const textContent = {
     openPlotBettermentTip:
       'In the regularization of the said plot, the provisions of Regulation No. 3.4.1 of the UDCPR shall be applicable in respect of a minimum 10% open space.',
     builtPlotBettermentTip:
-      'The provisions regarding open space under Regulation No. 3.4.1 shall be applicable.',
+      'The provisions regarding open space under Regulation No. 3.4.1 of the UDCPR shall be applicable.',
   },
   mr: {
     mainTitle: 'छत्रपती संभाजीनगर महानगरपालिका',
@@ -429,6 +453,7 @@ const textContent = {
     marginAreaPlaceholder: 'मार्जिनमधील बांधकाम (चौ.मी)',
     calculateBtn: 'हिशोब करा',
     generatePdfBtn: 'PDF तयार करा',
+    visitorCounterLabel: 'एकूण संकेतस्थळ भेटदार:',
     counterLabel: 'वापर संख्या',
     disclaimerTitle: 'सूचना',
     disclaimerText: 'कृपया लक्षात घ्या की हा कॅल्क्युलेटर फक्त अंदाजे चालान रक्कम दर्शवतो.<br>अंतिम भरपाई रक्कम संबंधित झोन अभियंत्याच्या मंजुरीनंतर निश्चित केली जाईल.<br>ही चलन पावती सिस्टम जनरेटेड आहे आणि त्यासाठी स्वाक्षरीची आवश्यकता नाही..',
@@ -468,7 +493,7 @@ const textContent = {
     asPerAncillary: 'पूरक',
     openPlotBettermentTip:
       'सदर भूखंडाच्या नियमितीकरणामध्ये किमान 10% खुली जागेकरिता UDCPR मधील विनियम क्रमांक 3.4.1 मधील तरतूदी लागु राहतील',
-    builtPlotBettermentTip: '3.4.1 मधील खुल्या जागेच्या तरतूदी लागू राहतील',
+    builtPlotBettermentTip: 'UDCPR मधील विनियम क्रमांक 3.4.1 मधील खुल्या जागेच्या तरतूदी लागू राहतील',
   }
 };
 
@@ -496,6 +521,7 @@ function updateContent() {
   document.getElementById('margin_area').placeholder = textContent[lang].marginAreaPlaceholder;
   document.getElementById('calculate-btn').innerText = textContent[lang].calculateBtn;
   document.getElementById('generate-pdf-btn').innerText = textContent[lang].generatePdfBtn;
+  document.getElementById('visitor-counter-label').innerText = textContent[lang].visitorCounterLabel;
   document.getElementById('disclaimer-title').innerText = textContent[lang].disclaimerTitle;
   document.getElementById('disclaimer-text').innerHTML = textContent[lang].disclaimerText;
   document.getElementById('links-title').innerText = textContent[lang].linksTitle;
@@ -865,6 +891,7 @@ function toggleForm() {
 document.addEventListener('DOMContentLoaded', () => {
   setLanguage('en');
   toggleForm();
+  updateVisitorCounter();
 });
 </script>
 </body>
