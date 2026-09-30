@@ -680,8 +680,6 @@ const scrutiny = Math.max(plot, res + comm) * 4;
 // BETTERMENT CHARGES - AREA-WISE
 // ============================================================
 
-const plinthArea = Math.min(res + comm, plot);
-
 let betterment = 0;
 let bettermentDisplay = '';
 let builtBettermentTip = '';
@@ -691,9 +689,9 @@ if (plot <= 300) {
     bettermentDisplay = '0%';
 
 } else if (plot <= 2000) {
-    const openLandArea = Math.max(0, plot - plinthArea);
+    const openArea = Math.max(0, plot - res - comm);
 
-    betterment = openLandArea * 1837 * 1;   // 100% payable
+    betterment = openArea * 1837 * 1;   // 100% payable
     bettermentDisplay = '100%';
     builtBettermentTip = textContent[currentLanguage].builtPlotBettermentTip;
 
