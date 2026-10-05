@@ -304,12 +304,14 @@
     <input type="number" step="0.01" id="asr_rate_open" placeholder="Enter ASR Rate">
   </div>
   <div id="built-form" class="section">
-    <input type="number" step="0.01" id="plot_area_built" placeholder="Enter Plot Area (sq.m)">
+    <input type="number" step="0.01" id="plot_area_built" placeholder="Enter Plot Area (sq.m)" oninput="toggleGroundFloorAreaInput()">
     <input type="number" step="0.01" id="asr_rate_built" placeholder="Enter ASR Rate">
     <input type="number" step="0.01" id="res_builtup" placeholder="Enter Built-up Area Residential">
     <input type="number" step="0.01" id="comm_builtup" placeholder="Enter Built-up Area Commercial">
     <input type="number" step="0.01" id="margin_area" placeholder="Built-up in Margins (sq.m)">
-    <input type="number" step="0.01" min="0" id="ground_floor_area" placeholder="Ground Floor Covered Area / Building Footprint (sq.m)">
+    <div id="ground-floor-area-input" style="display: none;">
+      <input type="number" step="0.01" min="0" id="ground_floor_area" placeholder="Ground Floor Covered Area / Building Footprint (sq.m)">
+    </div>
   </div>
   <div class="pdf-button">
     <button type="submit" id="calculate-btn">Calculate</button>
@@ -924,6 +926,12 @@ function toggleForm() {
     document.getElementById('open-form').style.display = 'none';
     document.getElementById('built-form').style.display = 'none';
   }
+}
+
+function toggleGroundFloorAreaInput() {
+  const plotArea = parseFloat(document.getElementById('plot_area_built').value);
+  const showInput = Number.isFinite(plotArea) && plotArea >= 300 && plotArea <= 2999;
+  document.getElementById('ground-floor-area-input').style.display = showInput ? 'block' : 'none';
 }
 
 document.addEventListener('DOMContentLoaded', () => {
