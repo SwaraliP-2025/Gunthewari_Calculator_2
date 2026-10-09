@@ -29,23 +29,40 @@
       padding-bottom: 120px;
     }
     header {
-      display: flex;
+      display: grid;
+      grid-template-columns: 80px minmax(0, 1fr) 80px;
       align-items: center;
-      justify-content: space-between;
+      gap: 18px;
       background: var(--gov-blue);
       color: var(--gov-white);
-      padding: 15px 20px;
-      flex-wrap: wrap;
+      padding: 15px 24px;
       box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+    }
+    .header-logo-left,
+    .header-logo-right {
+      width: 80px;
+      height: 80px;
+      box-sizing: border-box;
+      display: grid;
+      place-items: center;
+      padding: 7px;
+      background: var(--gov-white);
+      border: 1px solid rgba(255,255,255,0.7);
+      border-radius: 6px;
+      box-shadow: 0 2px 7px rgba(0,0,0,0.2);
     }
     .header-logo-left img,
     .header-logo-right img {
-      height: 64px;
+      display: block;
+      max-width: 100%;
+      max-height: 100%;
+      width: auto;
+      height: auto;
+      object-fit: contain;
     }
     .header-title {
-      flex: 1;
+      min-width: 0;
       text-align: center;
-      min-width: 220px;
     }
     .header-title h1 {
       font-size: 1.6rem;
@@ -61,13 +78,29 @@
     }
     @media (max-width: 600px) {
       header {
-        flex-direction: column;
-        text-align: center;
+        grid-template-columns: 56px minmax(0, 1fr) 56px;
+        grid-template-rows: 56px auto;
         gap: 8px;
+        padding: 12px;
+      }
+      .header-logo-left,
+      .header-logo-right {
+        width: 56px;
+        height: 56px;
+        padding: 5px;
+      }
+      .header-logo-left {
+        grid-column: 1;
+        grid-row: 1;
+      }
+      .header-logo-right {
+        grid-column: 3;
+        grid-row: 1;
       }
       .header-title {
+        grid-column: 1 / -1;
+        grid-row: 2;
         width: 100%;
-        margin-top: 8px;
       }
     }
     .language-toggle {
@@ -275,7 +308,7 @@
 <body>
 <header>
   <div class="header-logo-left">
-    <img src="CSMC_logo.jpg" alt="CSMC Logo">
+    <img src="CSMC_Logo1.png" alt="CSMC Logo">
   </div>
   <div class="header-title">
     <h1 id="main-title">Chhatrapati Sambhajinagar Municipal Corporation</h1>
